@@ -57,10 +57,10 @@ void listEnter(slist list, const char *input){
 	return;
 }
 
-void printList(slist list){
+void printList(slist list, FILE *fout){
 	node cur;
 	for(cur = list->first; cur; cur = cur->next) {
-		printf("%s\n", cur->name);
+		fprintf(fout, "%s\n", cur->name);
 	}
 	return;
 }

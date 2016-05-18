@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "slist.h"
+#include "graph.h"
 
 #define BUFF_SIZE 100
 
@@ -29,7 +30,7 @@ int main(int argc, char **argv){
 	}
 
 	sortlist(urls);
-	printList(urls);
+	printList(urls, stdout);
 
 	fclose(fin);
 	fclose(fout);
