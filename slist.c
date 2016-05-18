@@ -6,8 +6,7 @@
 typedef struct _node * node;
 
 struct _node {
-	char *name;
-	double prank;	
+	void *value
 	node next;
 };
 
@@ -15,60 +14,38 @@ struct _slist {
 	node first;
 	node *last;
 	node cur;
+	(void*)copy(void*);
+	(void)free(void*);
 	int num;
 };
 
 
-char listNext(slist list) {
-	if (!list->cur) return 0;
-	list->cur = list->cur->next;
-	return list->cur != NULL;
-}
 
-void listReset(slist list) {
-	list->cur = list->first;
-}
-
-char* listGetName(slist list) {
-	return list->cur ? list->cur->name : NULL;
-}
-
-void listSetValue(slist list, double val) {
-	if(list->cur) return;
-	list->cur->prank = val;
-}
-
-slist newList() {
+slist newList((void*)copy(void*), (void)fin(void*)) {
 	slist out = malloc(sizeof(struct _slist));
 	out->first = NULL;
 	out->last = &(out->first);
 	out->num = 0;
+	out->comp = comp;
+	out->free = fin;
 	return out;
 }
 
-void listEnter(slist list, const char *input){
+void listEnter(slist list, const void *input){
 	node new = malloc(sizeof(struct _node));
+	if(!list->first) list->cur = new;
 	*(list->last) = new;
 	list->last = &(new->next);
-	new->name = strdup(input);
-	new->prank = 0;
+	new->value = list->copy(input);
 	new->next = NULL;
 	list->num++;
-	return;
-}
-
-void printList(slist list, FILE *fout){
-	node cur;
-	for(cur = list->first; cur; cur = cur->next) {
-		fprintf(fout, "%s\n", cur->name);
-	}
 	return;
 }
 
 void freeList(slist list){
 	node cur,tmp;
 	for(cur = list->first; cur; cur = tmp) {
-		free(cur->name);
+		list->free(cur->value);
 		tmp = cur->next;
 		free(cur);
 	}
@@ -76,7 +53,7 @@ void freeList(slist list){
 	return;
 }
 
-static void mergesort(node *a, node *b, int parity, int start, int end){
+static void mergesort((signed char)comp(void*, void*), node *a, node *b, int parity, int start, int end){
 	if(start == end - 1) {
 		return;
 	}	
@@ -89,7 +66,7 @@ static void mergesort(node *a, node *b, int parity, int start, int end){
 	}
 	int lower = start, upper = (start + end) >> 1, i;
 	for (i = start; lower < (start + end) >> 1 && upper < end; i++) {
-		if (a[lower]->prank > a[upper]->prank) {
+		if (comp(a[lower], a[upper]) > 0) {
 			b[i] = a[lower];
 			lower++;
 		} else {
@@ -115,7 +92,7 @@ void sortlist(slist list){
 		a[i] = cur;
 		b[i] = cur;
 	}
-	mergesort(a,b,0,0,list->num);
+	mergesort(list->comp,a,b,0,0,list->num);
 	free(a);
 	for(a = &(list->first),i = 0; i < list->num; i++, a = &((*a)->next)){
 		*a = b[i];
