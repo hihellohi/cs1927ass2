@@ -4,10 +4,12 @@
 
 typedef struct _slist * slist;
 
-slist newList((void*)copy(void*), (void)fin(void*)i); 
-void listEnter(slist list, const char *input);
-void printList(slist list, FILE*);
+slist newList(void *(*copy)(void*), void (*fin)(void*)); 
+void *readList(slist list);
+void listReset(slist list);
+char listNext(slist list);
+int listLength(slist list);
+void listEnter(slist list, void *input);
 void freeList(slist list);
-void sortlist(slist list);
 
 #endif
