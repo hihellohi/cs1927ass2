@@ -30,6 +30,6 @@
 
 # Debug files
 *.dSYM/
-pagerank_list.txt
+pagerankList.txt
 *.stackdump
 *.swp

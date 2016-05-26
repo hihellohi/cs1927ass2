@@ -5,9 +5,12 @@
 #include "slist.h"
 #include "graph.h"
 #include "hashmap.h"
+#include "mergesort.h"
 
 #define BUFF_SIZE 100
 #define EPS 1E-6
+
+typedef struct _url * Url;
 
 typedef struct _url {
 	char *name;
@@ -15,63 +18,15 @@ typedef struct _url {
 	int outdeg;
 } url;
 
-static void *stringCopy(void *x){
-	return strdup((char*)x);
+static int urlComp(void* a, void* b){
+	if(((Url)a)->pRank < ((Url)b)->pRank - EPS) return -1;
+	return abs(((Url)a)->pRank - ((Url)b)->pRank) < EPS;
 }
 
-static void mergesort(url *a, url *b, int parity, int start, int end){
-	if(start == end - 1) {
-		return;
-	}	
-
-	mergesort(a,b,parity+1,start,(start + end) >> 1);
-	mergesort(a,b,parity+1,(start + end) >> 1, end);
-
-	if(parity % 2) {
-		url *tmp = a;
-		a = b;
-		b = tmp;
-	}
-
-	int lower = start, upper = (start + end) >> 1, i;
-	for (i = start; lower < (start + end) >> 1 && upper < end; i++) {
-		if (a[lower].pRank > a[upper].pRank - EPS) {
-			b[i] = a[lower];
-			lower++;
-		} else {
-			b[i] = a[upper];
-			upper++;
-		}
-	}
-
-	for (; lower < (start + end) >> 1; lower++, i++){
-		b[i] = a[lower];
-	}
-	for (; upper < end; upper++, i++) {
-		b[i] = a[upper];
-	}
-
-	return;
-}
-
-void sort(url *list, int length){
-	if(!length) return;
-	url *a = malloc(sizeof(url) * length);
-	
-	int i;
-	for (i = 0; i < length; i++) {
-		a[i] = list[i];
-	}
-
-	mergesort(a, list, 0, 0, length);
-	free(a);
-	return;
-}
-
-void print(url *input, FILE *output, int length){
+static void print(Url *input, FILE *output, int length){
 	int i;
 	for(i = 0; i < length; i++){
-		fprintf(output, "%s, %d, %.8lf\n", input[i].name, input[i].outdeg, input[i].pRank);
+		fprintf(output, "%s, %d, %.8lf\n", input[i]->name, input[i]->outdeg, input[i]->pRank);
 	}
 	return;
 }
@@ -89,7 +44,7 @@ int main(int argc, char **argv){
 	FILE *fout = fopen("pagerankList.txt","w");
 	double d, diffPR;
 	int maxIterations;
-	slist urls = newList(stringCopy, free);
+	slist urls = newList((void*)strdup, free);
 	d = atof(argv[1]);
 	diffPR = atof(argv[2]);
 	maxIterations = atoi(argv[3]);
@@ -104,23 +59,24 @@ int main(int argc, char **argv){
 	}
 	
 	int len = listLength(urls);
-	url *aurls = malloc(len * sizeof(url));
+	Url *aurls = malloc(len * sizeof(url));
 	Graph g = newGraph(len);
 	Hashmap m = newHashmap((len/2)*3);
 	
 	//convert llist to array for faster reading
 	int i;
 	for(i = 0; i < len; i++){
-		aurls[i].name = (char*)readList(urls);
-		aurls[i].pRank = (1/(double)len);
-		mapInsert(m, aurls[i].name, i);
+		aurls[i] = malloc(sizeof(url));
+		aurls[i]->name = (char*)readList(urls);
+		aurls[i]->pRank = (1/(double)len);
+		mapInsert(m, aurls[i]->name, i);
 		listNext(urls);
 	}
 
 	//build graph
 	for(i = 0; i < len; i++){
 		char filename[BUFF_SIZE];
-		strcpy(filename, aurls[i].name);
+		strcpy(filename, aurls[i]->name);
 		strcat(filename, ".txt");
 		FILE *webpage = fopen(filename, "r");
 		char *seen = calloc(len, sizeof(char));
@@ -152,7 +108,7 @@ int main(int argc, char **argv){
 			}
 			nOutgoingLinks = len - 1;
 		}
-		aurls[i].outdeg = nOutgoingLinks;
+		aurls[i]->outdeg = nOutgoingLinks;
 		fclose(webpage);
 		free(seen);
 	}
@@ -171,17 +127,17 @@ int main(int argc, char **argv){
 			slist inUrls;
 			for(inUrls = GetAdjacencies(g, j); hasNext(inUrls); listNext(inUrls)){
 				int val = *(int*)readList(inUrls);
-				sum += aurls[val].pRank / aurls[val].outdeg;
+				sum += aurls[val]->pRank / aurls[val]->outdeg;
 			}
 			listReset(inUrls);
 
 			sum *= d;
 			sum += (1 - d)/len;
-			diff += abs(aurls[j].pRank - sum);
+			diff += abs(aurls[j]->pRank - sum);
 			newPRanks[j] = sum;
 		}
 		for(j = 0; j < len; j++) {
-			aurls[j].pRank = newPRanks[j];
+			aurls[j]->pRank = newPRanks[j];
 		}
 	}
 	free(newPRanks);			
@@ -198,9 +154,13 @@ int main(int argc, char **argv){
 //		listReset(a);
 //	}
 
-	sort(aurls, len);
+	mergesort((void**)aurls, len, urlComp);
 	print(aurls, fout, len);
 	
+	for(i = 0; i < len; i++){
+		free(aurls[i]);
+	}
+
 	free(aurls);
 	fclose(fin);
 	fclose(fout);

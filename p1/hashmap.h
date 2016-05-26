@@ -1,4 +1,5 @@
 #ifndef HASHMAP
+#define HASHMAP
 typedef struct _hashmap * Hashmap;
 
 Hashmap newHashmap(int);

@@ -31,9 +31,9 @@ static unsigned int hash(char *key, int n){
 	unsigned int a = 84061;
 	int i;
 	for(i = 0; key[i]; i++){
-		a *= i * key[i];
-		a += 29423;
-		a %= 1000000007;
+		a *= (key[i] - ' ');
+		a += i * 44809;
+		a %= 104729;
 	}
 	return a % n;
 }
