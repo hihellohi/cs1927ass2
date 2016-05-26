@@ -5,6 +5,7 @@
 #define GRAPH_H
 
 #include <stdio.h>
+#include "slist.h"
 
 // graph representation is hidden
 typedef struct GraphRep *Graph;
@@ -14,12 +15,12 @@ typedef int Vertex;
 int   validV(Graph,Vertex); //validity check
 
 // edges are pairs of vertices (end-points)
-void insertEdge(Graph, Vertex, Vertex, int);
-void removeEdge(Graph, Vertex, Vertex);
+void insertEdge(Graph, Vertex, Vertex);
+
+slist GetAdjacencies(Graph g, Vertex v);
 
 // operations on graphs
 Graph newGraph(int nV);
 void dropGraph(Graph);
-void showGraph(Graph, char **);
 
 #endif

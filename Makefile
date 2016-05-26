@@ -9,7 +9,7 @@ pagerank.o : pagerank.c slist.h graph.h
 
 slist.o : slist.c slist.h
 
-graph.o : graph.c graph.h
+graph.o : graph.c graph.h slist.h
 
 clean :
 	rm -f pagerank $(OBJS) core

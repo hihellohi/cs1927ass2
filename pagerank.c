@@ -11,7 +11,7 @@ typedef struct _url {
 	double *pRank;
 } url;
 
-void *stringCopy(void *x){
+static void *stringCopy(void *x){
 	return strdup((char*)x);
 }
 
@@ -88,20 +88,58 @@ int main(int argc, char **argv){
 		}
 		listEnter(urls, buffer);
 	}
-
-	url *aurls = malloc(listLength(urls) * sizeof(url));
+	
+	int len = listLength(urls);
+	url *aurls = malloc(len * sizeof(url));
+	int *outdeg = malloc(len * sizeof(int));
+	Graph g = newGraph(len);
 	
 	int i;
-	for(i = 0; i < listLength(urls); i++){
+	for(i = 0; i < len; i++){
 		aurls[i].name = (char*)readList(urls);
 		aurls[i].pRank = 0;
 		listNext(urls);
 	}
 
-	Graph g = newGraph(listLength(urls));
+	for(i = 0; i < len; i++){
+		char filename[BUFF_SIZE];
+		strcpy(filename, aurls[i].name);
+		strcat(filename, ".txt");
+		FILE *webpage = fopen(filename, "r");
+		fscanf(webpage, "#start Section-1");
+		while (fscanf(webpage, "%s", buffer) != EOF){
+			if(buffer[0] == ' ' || buffer[0] == '\t' || buffer[0] == '\n'){
+				continue;
+			}
+			if(!strcmp(buffer, "#end")){
+				break;
+			}
+			int j;
+			//USE HASHMAP TIME ALLOWING
+			for(j = 0; j < len; j++){
+				if(!strcmp(buffer, aurls[j].name)){
+					insertEdge(g,j,i);
+					break;
+				}
+			}
+		}
+		fclose(webpage);
+	}
 
-	sort(aurls, listLength(urls));
-	print(aurls, stdout, listLength(urls));
+	for(i = 0; i < len; i++){
+		slist a = GetAdjacencies(g, i);
+		int j;
+		printf("%s ->", aurls[i].name);
+		for(j = 0; j < listLength(a); j++){
+			printf("%s ", aurls[*(int*)readList(a)].name);
+			listNext(a);
+		}
+		printf("\n");
+		listReset(a);
+	}
+
+	sort(aurls, len);
+	print(aurls, stdout, len);
 	
 	free(aurls);
 	fclose(fin);

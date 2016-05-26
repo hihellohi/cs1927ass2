@@ -6,12 +6,12 @@
 #include <assert.h>
 #include <string.h>
 #include "Graph.h"
+#include "slist.h"
 
 // graph representation (adjacency matrix)
 typedef struct GraphRep {
 	int    nV;    // #vertices
-	int    nE;    // #edges
-	int  **edges; // matrix of weights (0 == no edge)
+	slist  *edges; // matrix of weights (0 == no edge)
 } GraphRep;
 
 // check validity of Vertex
@@ -22,26 +22,21 @@ int validV(Graph g, Vertex v)
 
 // insert an Edge
 // - sets (v,w) and (w,v)
-void insertEdge(Graph g, Vertex v, Vertex w, int wt)
+void insertEdge(Graph g, Vertex v, Vertex w)
 {
 	assert(g != NULL && validV(g,v) && validV(g,w));
-	if (g->edges[v][w] == 0) {
-		g->edges[v][w] = wt;
-		g->edges[w][v] = wt;
-		g->nE++;
-	}
+	listEnter(g->edges[v], &w);
+	return;
 }
 
-// remove an Edge
-// - unsets (v,w) and (w,v)
-void removeEdge(Graph g, Vertex v, Vertex w)
-{
-	assert(g != NULL && validV(g,v) && validV(g,w));
-	if (g->edges[v][w] != 0) {
-		g->edges[v][w] = 0;
-		g->edges[w][v] = 0;
-		g->nE--;
-	}
+slist GetAdjacencies(Graph g, Vertex v) {
+	return g->edges[v];
+}
+
+static void *intcopy(void *a){
+	int *b = malloc(sizeof(int));
+	*b = *(int*)a;
+	return b;
 }
 
 // create an empty graph
@@ -49,12 +44,11 @@ Graph newGraph(int nV)
 {
 	assert(nV > 0);
 	Graph new = malloc(sizeof(struct GraphRep));
-	new->nE = 0;
 	new->nV = nV;
-	new->edges = malloc(sizeof(int*) * nV);
+	new->edges = malloc(sizeof(slist) * nV);
 	int i;
 	for(i = 0; i < nV; i++){
-		new->edges[i] = calloc(nV, sizeof(int));
+		new->edges[i] = newList(intcopy, free);
 	}
 	return new;
 }
@@ -65,26 +59,8 @@ void dropGraph(Graph g)
 	assert(g != NULL);
 	int i;
 	for(i = 0; i < g->nV; i++){
-		free(g->edges[i]);
+		freeList(g->edges[i]);
 	}
 	free(g->edges);
 	free(g);	
 }
-
-// display graph, using names for vertices
-void showGraph(Graph g, char **names)
-{
-	assert(g != NULL);
-	printf("#vertices=%d, #edges=%d\n\n",g->nV,g->nE);
-	int v, w;
-	for (v = 0; v < g->nV; v++) {
-		printf("%d %s\n",v,names[v]);
-		for (w = 0; w < g->nV; w++) {
-			if (g->edges[v][w]) {
-				printf("\t%s (%d)\n",names[w],g->edges[v][w]);
-			}
-		}
-		printf("\n");
-	}
-}
-
