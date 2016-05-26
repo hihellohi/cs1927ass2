@@ -7,9 +7,11 @@
 
 #define BUFF_SIZE 100
 #define EPS 1E-6
+
 typedef struct _url {
 	char *name;
 	double pRank;
+	int outdeg;
 } url;
 
 static void *stringCopy(void *x){
@@ -33,7 +35,6 @@ static void mergesort(url *a, url *b, int parity, int start, int end){
 	int lower = start, upper = (start + end) >> 1, i;
 	for (i = start; lower < (start + end) >> 1 && upper < end; i++) {
 		if (a[lower].pRank > a[upper].pRank + EPS) {
-		//if(strcmp(a[lower].name, a[upper].name) > 1){
 			b[i] = a[lower];
 			lower++;
 		} else {
@@ -69,7 +70,7 @@ void sort(url *list, int length){
 void print(url *input, FILE *output, int length){
 	int i;
 	for(i = 0; i < length; i++){
-		fprintf(output, "%s\n", input[i].name);
+		fprintf(output, "%s, %d, %.8lf\n", input[i].name, input[i].outdeg, input[i].pRank);
 	}
 	return;
 }
@@ -103,7 +104,6 @@ int main(int argc, char **argv){
 	
 	int len = listLength(urls);
 	url *aurls = malloc(len * sizeof(url));
-	int *outdeg = malloc(len * sizeof(int));
 	Graph g = newGraph(len);
 	
 	//convert llist to array for faster reading
@@ -155,7 +155,7 @@ int main(int argc, char **argv){
 			}
 			nOutgoingLinks = len - 1;
 		}
-		outdeg[i] = nOutgoingLinks;
+		aurls[i].outdeg = nOutgoingLinks;
 		fclose(webpage);
 		free(seen);
 	}
@@ -171,7 +171,7 @@ int main(int argc, char **argv){
 			slist inUrls;
 			for(inUrls = GetAdjacencies(g, j); hasNext(inUrls); listNext(inUrls)){
 				int val = *(int*)readList(inUrls);
-				sum += aurls[val].pRank / outdeg[val];
+				sum += aurls[val].pRank / aurls[val].outdeg;
 			}
 			listReset(inUrls);
 
@@ -186,22 +186,21 @@ int main(int argc, char **argv){
 	}
 	free(newPRanks);			
 
-	//print list (temporary)
-	for(i = 0; i < len; i++){
-		printf("%s, deg: %d, PR: %lf <- ", aurls[i].name, outdeg[i], aurls[i].pRank);
-
-		slist a;
-		for(a = GetAdjacencies(g, i); hasNext(a); listNext(a)){
-			printf("%s ", aurls[*(int*)readList(a)].name);
-		}
-		printf("\n");
-		listReset(a);
-	}
+//	//print list (temporary)
+//	for(i = 0; i < len; i++){
+//		printf("%s, deg: %d, PR: %lf <- ", aurls[i].name, aurls[i].outdeg, aurls[i].pRank);
+//
+//		slist a;
+//		for(a = GetAdjacencies(g, i); hasNext(a); listNext(a)){
+//			printf("%s ", aurls[*(int*)readList(a)].name);
+//		}
+//		printf("\n");
+//		listReset(a);
+//	}
 
 	sort(aurls, len);
-	print(aurls, stdout, len);
+	print(aurls, fout, len);
 	
-	free(outdeg);
 	free(aurls);
 	fclose(fin);
 	fclose(fout);
