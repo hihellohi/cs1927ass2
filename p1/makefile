@@ -1,7 +1,7 @@
 CC=gcc
 CFLAGS=-Wall -g
-OBJM=slist.o mergesort.o
-OBJS=pagerank.o graph.o hashmap.o
+OBJM=slist.o mergesort.o hashmap.o
+OBJS=pagerank.o graph.o
 OBJSC=searchPagerank.o 
 
 all: pagerank searchPagerank
@@ -12,9 +12,9 @@ searchPagerank : $(OBJSC) $(OBJM)
 pagerank : $(OBJS) $(OBJM)
 	$(CC) -o pagerank $(OBJS) $(OBJM)
 
-searchPagerank.o : searchPagerank.c
+searchPagerank.o : searchPagerank.c mergesort.h hashmap.h slist.h
 
-pagerank.o : pagerank.c slist.h graph.h
+pagerank.o : pagerank.c slist.h graph.h mergesort.h hashmap.h
 
 slist.o : slist.c slist.h
 

@@ -61,7 +61,7 @@ int main(int argc, char **argv){
 	int len = listLength(urls);
 	Url *aurls = malloc(len * sizeof(url));
 	Graph g = newGraph(len);
-	Hashmap m = newHashmap((len/2)*3);
+	Hashmap m = newHashmap((len*3)/2);
 	
 	//convert llist to array for faster reading
 	int i;
@@ -154,7 +154,7 @@ int main(int argc, char **argv){
 //		listReset(a);
 //	}
 
-	mergesort((void**)aurls, len, urlComp);
+	mergesort((void**)aurls, len, urlComp, 0);
 	print(aurls, fout, len);
 	
 	for(i = 0; i < len; i++){

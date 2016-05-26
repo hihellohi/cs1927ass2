@@ -72,6 +72,18 @@ void mapInsert(Hashmap m, char *key, int value){
 	return;
 }
 
+void mapIncrement(Hashmap m, char *key) {
+	slist l;
+	for(l = m->data[hash(key, m->nSlots)]; hasNext(l); listNext(l)) {
+		listItem *val = ((listItem*)readList(l));
+		if(!strcmp(val->key, key)){
+			val->value++;
+			break;
+		}
+	}
+	listReset(l);
+}
+
 int mapSearch(Hashmap m, char *key) {
 	slist l;
 	int out = -1;

@@ -1,13 +1,13 @@
 #include <stdlib.h>
 #include "mergesort.h"
 
-static void sort(void **a, void **b, int parity, int start, int end, int (*comp)(void*, void*)){
+static void sort(void **a, void **b, int parity, int start, int end, int (*comp)(void*, void*), char revr){
 	if(start == end - 1) {
 		return;
 	}	
 
-	sort(a,b,parity+1,start,(start + end) >> 1, comp);
-	sort(a,b,parity+1,(start + end) >> 1, end, comp);
+	sort(a,b,parity+1,start,(start + end) >> 1, comp, revr);
+	sort(a,b,parity+1,(start + end) >> 1, end, comp, revr);
 
 	if(parity % 2) {
 		void **tmp = a;
@@ -17,7 +17,8 @@ static void sort(void **a, void **b, int parity, int start, int end, int (*comp)
 
 	int lower = start, upper = (start + end) >> 1, i;
 	for (i = start; lower < (start + end) >> 1 && upper < end; i++) {
-		if(comp(a[lower], a[upper]) >= 0){
+		int tmp = (comp(a[lower], a[upper]) > 0);
+		if(!tmp || ((tmp > 0) != (revr != 0))){
 			b[i] = a[lower];
 			lower++;
 		} else {
@@ -36,7 +37,7 @@ static void sort(void **a, void **b, int parity, int start, int end, int (*comp)
 	return;
 }
 
-void mergesort(void **list, int length, int (*comp)(void*, void*)){
+void mergesort(void **list, int length, int (*comp)(void*, void*), char revr){
 	if(!length) return;
 	void **a = malloc(sizeof(void*) * length);
 	
@@ -45,7 +46,7 @@ void mergesort(void **list, int length, int (*comp)(void*, void*)){
 		a[i] = list[i];
 	}
 
-	sort(a, list, 0, 0, length, comp);
+	sort(a, list, 0, 0, length, comp, revr);
 	free(a);
 	return;
 }
