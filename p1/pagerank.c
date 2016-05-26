@@ -4,6 +4,7 @@
 #include <math.h>
 #include "slist.h"
 #include "graph.h"
+#include "hashmap.h"
 
 #define BUFF_SIZE 100
 #define EPS 1E-6
@@ -34,7 +35,7 @@ static void mergesort(url *a, url *b, int parity, int start, int end){
 
 	int lower = start, upper = (start + end) >> 1, i;
 	for (i = start; lower < (start + end) >> 1 && upper < end; i++) {
-		if (a[lower].pRank > a[upper].pRank + EPS) {
+		if (a[lower].pRank > a[upper].pRank - EPS) {
 			b[i] = a[lower];
 			lower++;
 		} else {
@@ -85,7 +86,7 @@ int main(int argc, char **argv){
 
 	//initialise i/o
 	FILE *fin = fopen("collection.txt","r");
-	FILE *fout = fopen("pagerank_list.txt","w");
+	FILE *fout = fopen("pagerankList.txt","w");
 	double d, diffPR;
 	int maxIterations;
 	slist urls = newList(stringCopy, free);
@@ -105,12 +106,14 @@ int main(int argc, char **argv){
 	int len = listLength(urls);
 	url *aurls = malloc(len * sizeof(url));
 	Graph g = newGraph(len);
+	Hashmap m = newHashmap((len/2)*3);
 	
 	//convert llist to array for faster reading
 	int i;
 	for(i = 0; i < len; i++){
 		aurls[i].name = (char*)readList(urls);
 		aurls[i].pRank = (1/(double)len);
+		mapInsert(m, aurls[i].name, i);
 		listNext(urls);
 	}
 
@@ -132,17 +135,11 @@ int main(int argc, char **argv){
 				break;
 			}
 
-			//USE HASHMAP TIME ALLOWING
-			int j;
-			for(j = 0; j < len; j++){
-				if(!strcmp(buffer, aurls[j].name)){
-					if(j != i && !seen[j]){
-						insertEdge(g,j,i);
-						seen[j] = 1;
-						nOutgoingLinks++;
-					}
-					break;
-				}
+			int j = mapSearch(m, buffer);
+			if(j != -1 && j != i && !seen[j]){
+				insertEdge(g,j,i);
+				seen[j] = 1;
+				nOutgoingLinks++;
 			}
 		}
 
@@ -159,7 +156,10 @@ int main(int argc, char **argv){
 		fclose(webpage);
 		free(seen);
 	}
+	
+	dropMap(m);
 
+	//calculate pagerank
 	double diff = diffPR, *newPRanks = malloc(len * sizeof(double));
 	for(i = 0; i < maxIterations && diff > diffPR - EPS; i++){
 		diff = 0;

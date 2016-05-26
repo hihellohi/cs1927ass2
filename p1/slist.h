@@ -1,4 +1,3 @@
-
 #ifndef SLIST
 #define SLIST
 
