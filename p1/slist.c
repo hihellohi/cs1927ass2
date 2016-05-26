@@ -27,6 +27,10 @@ void listReset(slist list) {
 	list->cur = list->first;
 }
 
+char hasNext(slist list) {
+	return list->cur != NULL;
+}
+
 char listNext(slist list) {
 	if (!list->cur) return 0;
 	list->cur = list->cur->next;

@@ -31,4 +31,5 @@
 # Debug files
 *.dSYM/
 pagerank_list.txt
+*.stackdump
 *.swp
