@@ -6,6 +6,7 @@
 #include "hashmap.h"
 
 #define BUFF_SIZE 1000
+#define MAX_DISPLAY 10
 
 int main(int argc, char **argv) {
 	FILE *iI = fopen("invertedIndex.txt", "r");
@@ -28,12 +29,53 @@ int main(int argc, char **argv) {
 		char *val = (char*)readList(l);
 		mapInsert(urls, val, 0);
 	}
+	listReset(l);
 
 	mergesort((void**)(argv + 1), argc - 1, (int (*)(void*, void*))strcmp, 1);
 	
 	int i;
-	for(i = 1; i < argc; i++){
-		printf("%s\n", argv[i]);
+	for(i = 1; i < argc && !feof(iI); i++){
+		char key[BUFF_SIZE];
+		FILE *tmp = tmpfile();
+
+		do {
+			fclose(tmp);
+
+			if(feof(iI)){
+				tmp = NULL;
+				break;
+			}
+			
+			tmp = tmpfile();
+			do {
+				fgets(buffer, BUFF_SIZE, iI);
+				fprintf(tmp, "%s", buffer);
+			} while(!strchr(buffer, '\n') && !feof(iI));
+
+			rewind(tmp);
+			key[0] = 0;
+			fscanf(tmp, "%s", key);
+		} while(strcmp(key, argv[i]));
+		
+		if(!tmp){
+			break;
+		}
+		
+		while(fscanf(tmp, "%s", key) != EOF){
+			mapIncrement(urls, key);
+		}
+		
+		fclose(tmp);
+	}
+
+	int count = 0;
+	if (i == argc){
+		for(listReset(l); hasNext(l) && count < MAX_DISPLAY; listNext(l)){
+			if (mapSearch(urls, (char*)readList(l)) == argc - 1){
+				printf("%s\n", (char*)readList(l));
+				count++;
+			}
+		}
 	}
 
 	dropMap(urls);

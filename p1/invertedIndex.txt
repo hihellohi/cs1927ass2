@@ -1,3 +1,4 @@
-design  url31 url2 url61 url25
-mars url31 url25 url101
-vegetation  url61 url31
+jupiter url21 url23 url34
+mars url11 url22 url31 url32
+saturn url31 url32 url11 url21
+venus url11 url23 url34
