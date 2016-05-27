@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <assert.h>
 #include "slist.h"
 #include "graph.h"
 #include "hashmap.h"
@@ -52,9 +53,7 @@ int main(int argc, char **argv){
 	//read collection.txt
 	char buffer[BUFF_SIZE];
 	while(fscanf(fin, "%s", buffer) != EOF){
-		if(buffer[0] == ' ' || buffer[0] == '\t' || buffer[0] == '\n'){
-			continue;
-		}
+		assert(buffer[0]);
 		listEnter(urls, buffer);
 	}
 	

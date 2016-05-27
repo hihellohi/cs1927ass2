@@ -29,6 +29,7 @@ void insertEdge(Graph g, Vertex v, Vertex w)
 	return;
 }
 
+//returns a list of nodes adjacent to v
 slist GetAdjacencies(Graph g, Vertex v) {
 	return g->edges[v];
 }

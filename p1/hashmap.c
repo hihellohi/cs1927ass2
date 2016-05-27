@@ -38,6 +38,7 @@ static unsigned int hash(char *key, int n){
 	return a % n;
 }
 
+//Creates new hashmap with an array of length nSlots
 Hashmap newHashmap(int nSlots){
 	Hashmap new = malloc(sizeof(hashmap));
 	new->nItems = 0;
@@ -51,6 +52,7 @@ Hashmap newHashmap(int nSlots){
 	return new;
 }
 
+//m[key] = value
 void mapInsert(Hashmap m, char *key, int value){
 	slist l;
 	char found = 0;
@@ -72,6 +74,7 @@ void mapInsert(Hashmap m, char *key, int value){
 	return;
 }
 
+//m[key]++
 void mapIncrement(Hashmap m, char *key) {
 	slist l;
 	for(l = m->data[hash(key, m->nSlots)]; hasNext(l); listNext(l)) {
@@ -84,6 +87,7 @@ void mapIncrement(Hashmap m, char *key) {
 	listReset(l);
 }
 
+//m[key]
 int mapSearch(Hashmap m, char *key) {
 	slist l;
 	int out = -1;
@@ -98,6 +102,7 @@ int mapSearch(Hashmap m, char *key) {
 	return out;
 }
 
+//frees the map
 void dropMap(Hashmap m) {
 
 	int i;

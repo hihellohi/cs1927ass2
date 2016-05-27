@@ -1,20 +1,32 @@
 CC=gcc
 CFLAGS=-Wall -g
-OBJM=slist.o mergesort.o hashmap.o
-OBJS=pagerank.o graph.o
+OBJSAC2=slist.o mergesort.o hashmap.o
+OBJSA=pagerank.o graph.o
 OBJSC=searchPagerank.o 
+OBJS2=searchTfIdf.o
 
-all: pagerank searchPagerank
+all: pagerank searchPagerank searchTfIdf
 
-searchPagerank : $(OBJSC) $(OBJM)
-	$(CC) -o searchPagerank $(OBJSC) $(OBJM)
 
-pagerank : $(OBJS) $(OBJM)
-	$(CC) -o pagerank $(OBJS) $(OBJM)
+
+searchTfIdf : $(OBJS2) $(OBJSAC2)
+	$(CC) -o searchTfIdf $(OBJS2) $(OBJSAC2)
+
+searchPagerank : $(OBJSC) $(OBJSAC2)
+	$(CC) -o searchPagerank $(OBJSC) $(OBJSAC2)
+
+pagerank : $(OBJSA) $(OBJSAC2)
+	$(CC) -o pagerank $(OBJSA) $(OBJSAC2)
+
+
 
 searchPagerank.o : searchPagerank.c mergesort.h hashmap.h slist.h
 
 pagerank.o : pagerank.c slist.h graph.h mergesort.h hashmap.h
+
+searchTfIdf.o : searchTfIdf.c mergesort.h hashmap.h slist.h
+
+
 
 slist.o : slist.c slist.h
 
@@ -23,6 +35,8 @@ graph.o : graph.c graph.h slist.h
 hashmap.o : hashmap.c hashmap.h slist.h
 
 mergesort.o : mergesort.c mergesort.h
+
+
 
 clean :
 	rm -f pagerank searchPagerank *.o core
