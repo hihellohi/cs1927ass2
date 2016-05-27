@@ -7,7 +7,9 @@
 #include "slist.h"
 #include "mergesort.h"
 
-#define BUFF_SIZE 1000
+#define BUFF_SIZE 70
+#define EPS 1E-6
+#define MAX_DISPLAY 10
 
 typedef struct _url * Url;
 
@@ -15,6 +17,11 @@ typedef struct _url {
 	char *name;
 	double tfidf;
 } url;
+
+static int urlComp(void* a, void* b){
+	if(((Url)a)->tfidf < ((Url)b)->tfidf - EPS) return -1;
+	return abs(((Url)a)->tfidf - ((Url)b)->tfidf) < EPS;
+}
 
 int main(int argc, char **argv){
 	argc--;
@@ -38,7 +45,7 @@ int main(int argc, char **argv){
 	slist l = newList((void*)strdup, free);
 	char buffer[BUFF_SIZE];
 	while(fscanf(collection, "%s", buffer) != EOF){
-		assert(buffer[9]);
+		assert(buffer[0]);
 		listEnter(l, buffer);
 	}
 
@@ -52,7 +59,7 @@ int main(int argc, char **argv){
 		int index = mapSearch(m, buffer);
 		if(index == -1){
 			
-			//read to end of line
+			// read to end of line
 			while(fgetc(inverted) != '\n' && !feof(inverted));
 
 		} else {
@@ -63,14 +70,50 @@ int main(int argc, char **argv){
 			}
 
 			assert(j);
-			idf[index] = log((double)len/(double)j);
+			idf[index] = log10(len/(double)j);
 		}
 	}
 
-	for(i = 0; i < argc; i++){
-		printf("%s: %.6lf\n", argv[i], idf[i]);
-	}
+	// calculate tfidfs and push to array for sorting
+	Url *urls = malloc(len * sizeof(Url));
+	for(listReset(l), i = 0; hasNext(l); listNext(l), i++) {
+		urls[i] = malloc(sizeof(url));
+		urls[i]->name = (char*)readList(l);
+		urls[i]->tfidf = 0;
 
+		strcpy(buffer, urls[i]->name);
+		strcat(buffer, ".txt");
+		FILE *f = fopen(buffer, "r");
+		
+		//jump to section 2 fscanf(f, "#start Section-2");
+		while(fscanf(f, "%s", buffer) != EOF) {
+			if(!strcmp(buffer, "#end")){
+				break;
+			}
+
+			//normalise buffer
+
+			int index = mapSearch(m, buffer);
+			if(index != -1){
+				urls[i]->tfidf += idf[index];
+			}
+		}
+
+		fclose(f);
+	}
+	
+	mergesort((void**)urls, len, urlComp, 1);
+
+	for(i = 0; i < ((len < MAX_DISPLAY) ? len : MAX_DISPLAY); i++){
+		printf("%s %.6lf\n", urls[i]->name, urls[i]->tfidf);
+	}
+	
+	for(i = 0; i < len; i++){
+		free(urls[i]);
+	}
+	
+	free(urls);
+	fclose(inverted);
 	fclose(collection);
 	freeList(l);
 	free(idf);

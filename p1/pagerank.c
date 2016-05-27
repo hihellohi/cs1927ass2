@@ -8,7 +8,7 @@
 #include "hashmap.h"
 #include "mergesort.h"
 
-#define BUFF_SIZE 100
+#define BUFF_SIZE 70
 #define EPS 1E-6
 
 typedef struct _url * Url;
@@ -21,7 +21,7 @@ typedef struct _url {
 
 static int urlComp(void* a, void* b){
 	if(((Url)a)->pRank < ((Url)b)->pRank - EPS) return -1;
-	if(abs(((Url)a)->pRank - ((Url)b)->pRank) >= EPS) return 1;
+	if(((Url)a)->pRank > ((Url)b)->pRank + EPS) return 1;
 	if(((Url)a)->outdeg < ((Url)b)->outdeg) return -1;
 	return ((Url)a)->outdeg > ((Url)b)->outdeg;
 }
@@ -73,21 +73,18 @@ int main(int argc, char **argv){
 		mapInsert(m, aurls[i]->name, i);
 		listNext(urls);
 	}
+	listReset(urls);
 
 	//build graph
 	for(i = 0; i < len; i++){
-		char filename[BUFF_SIZE];
-		strcpy(filename, aurls[i]->name);
-		strcat(filename, ".txt");
-		FILE *webpage = fopen(filename, "r");
+		strcpy(buffer, aurls[i]->name);
+		strcat(buffer, ".txt");
+		FILE *webpage = fopen(buffer, "r");
 		char *seen = calloc(len, sizeof(char));
 		int nOutgoingLinks = 0;
 
 		fscanf(webpage, "#start Section-1");
 		while (fscanf(webpage, "%s", buffer) != EOF){
-			if(buffer[0] == ' ' || buffer[0] == '\t' || buffer[0] == '\n'){
-				continue;
-			}
 			if(!strcmp(buffer, "#end")){
 				break;
 			}
@@ -142,18 +139,6 @@ int main(int argc, char **argv){
 		}
 	}
 	free(newPRanks);			
-
-//	//print list (temporary)
-//	for(i = 0; i < len; i++){
-//		printf("%s, deg: %d, PR: %lf <- ", aurls[i].name, aurls[i].outdeg, aurls[i].pRank);
-//
-//		slist a;
-//		for(a = GetAdjacencies(g, i); hasNext(a); listNext(a)){
-//			printf("%s ", aurls[*(int*)readList(a)].name);
-//		}
-//		printf("\n");
-//		listReset(a);
-//	}
 
 	mergesort((void**)aurls, len, urlComp, 1);
 	print(aurls, fout, len);

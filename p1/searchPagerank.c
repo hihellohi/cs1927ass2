@@ -5,7 +5,7 @@
 #include "mergesort.h"
 #include "hashmap.h"
 
-#define BUFF_SIZE 1000
+#define BUFF_SIZE 100
 #define MAX_DISPLAY 10
 
 int main(int argc, char **argv) {
@@ -23,6 +23,7 @@ int main(int argc, char **argv) {
 	char buffer[BUFF_SIZE];
 	while(fgets(buffer, BUFF_SIZE, pL)) {		
 		char *c = strchr(buffer, ',');
+		if(!c) continue;
 		*c = '\0';
 		listEnter(l, buffer);
 	}
