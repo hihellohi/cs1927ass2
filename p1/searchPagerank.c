@@ -11,7 +11,10 @@
 int main(int argc, char **argv) {
 	FILE *iI = fopen("invertedIndex.txt", "r");
 	FILE *pL = fopen("pagerankList.txt", "r"); 
-	if(!(iI && pL)) return EXIT_FAILURE;
+	if(!(iI && pL)){
+		fprintf(stderr, "Error opening file");
+		return EXIT_FAILURE;
+	}
 
 	slist l = newList((void*)strdup, free);
 
@@ -33,39 +36,18 @@ int main(int argc, char **argv) {
 
 	mergesort((void**)(argv + 1), argc - 1, (int (*)(void*, void*))strcmp, 1);
 	
-	int i;
-	for(i = 1; i < argc && !feof(iI); i++){
-		char key[BUFF_SIZE];
-		FILE *tmp = tmpfile();
-
-		do {
-			fclose(tmp);
-
-			if(feof(iI)){
-				tmp = NULL;
-				break;
+	int i = 1;
+	while(i < argc && !feof(iI)) {
+		fscanf(iI, "%s", buffer);
+		if (strcmp(buffer, argv[i])) {
+			while(fgetc(iI) != '\n' && !feof(iI));
+		} else {
+			i++;
+			while(fgetc(iI) != '\n' && !feof(iI)) {
+				fscanf(iI, "%s", buffer);
+				mapIncrement(urls, buffer);
 			}
-			
-			tmp = tmpfile();
-			do {
-				fgets(buffer, BUFF_SIZE, iI);
-				fprintf(tmp, "%s", buffer);
-			} while(!strchr(buffer, '\n') && !feof(iI));
-
-			rewind(tmp);
-			key[0] = 0;
-			fscanf(tmp, "%s", key);
-		} while(strcmp(key, argv[i]));
-		
-		if(!tmp){
-			break;
 		}
-		
-		while(fscanf(tmp, "%s", key) != EOF){
-			mapIncrement(urls, key);
-		}
-		
-		fclose(tmp);
 	}
 
 	int count = 0;
