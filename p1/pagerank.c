@@ -21,7 +21,9 @@ typedef struct _url {
 
 static int urlComp(void* a, void* b){
 	if(((Url)a)->pRank < ((Url)b)->pRank - EPS) return -1;
-	return abs(((Url)a)->pRank - ((Url)b)->pRank) < EPS;
+	if(abs(((Url)a)->pRank - ((Url)b)->pRank) >= EPS) return 1;
+	if(((Url)a)->outdeg < ((Url)b)->outdeg) return -1;
+	return ((Url)a)->outdeg > ((Url)b)->outdeg;
 }
 
 static void print(Url *input, FILE *output, int length){
@@ -153,7 +155,7 @@ int main(int argc, char **argv){
 //		listReset(a);
 //	}
 
-	mergesort((void**)aurls, len, urlComp, 0);
+	mergesort((void**)aurls, len, urlComp, 1);
 	print(aurls, fout, len);
 	
 	for(i = 0; i < len; i++){

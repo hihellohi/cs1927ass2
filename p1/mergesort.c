@@ -17,8 +17,8 @@ static void sort(void **a, void **b, int parity, int start, int end, int (*comp)
 
 	int lower = start, upper = (start + end) >> 1, i;
 	for (i = start; lower < (start + end) >> 1 && upper < end; i++) {
-		int tmp = (comp(a[lower], a[upper]) > 0);
-		if(!tmp || ((tmp > 0) != (revr != 0))){
+		int tmp = comp(a[lower], a[upper]);
+		if(!tmp || ((tmp > 0) == (revr != 0))){
 			b[i] = a[lower];
 			lower++;
 		} else {

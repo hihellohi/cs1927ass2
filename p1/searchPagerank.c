@@ -36,7 +36,7 @@ int main(int argc, char **argv) {
 	}
 	listReset(l);
 
-	mergesort((void**)(argv + 1), argc - 1, (int (*)(void*, void*))strcmp, 1);
+	mergesort((void**)(argv + 1), argc - 1, (int (*)(void*, void*))strcmp, 0);
 	
 	int i = 1;
 	while(i < argc && !feof(iI)) {
