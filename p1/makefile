@@ -3,7 +3,7 @@ CFLAGS=-Wall -g
 OBJSAC2=slist.o mergesort.o hashmap.o
 OBJSA=pagerank.o graph.o
 OBJSC=searchPagerank.o 
-OBJS2=searchTfIdf.o
+OBJS2=searchTfIdf.o normalise.o
 
 all: pagerank searchPagerank searchTfIdf
 
@@ -24,7 +24,7 @@ searchPagerank.o : searchPagerank.c mergesort.h hashmap.h slist.h
 
 pagerank.o : pagerank.c slist.h graph.h mergesort.h hashmap.h
 
-searchTfIdf.o : searchTfIdf.c mergesort.h hashmap.h slist.h
+searchTfIdf.o : searchTfIdf.c mergesort.h hashmap.h slist.h normalise.h
 
 
 
@@ -36,6 +36,7 @@ hashmap.o : hashmap.c hashmap.h slist.h
 
 mergesort.o : mergesort.c mergesort.h
 
+normalise.o : normalise.c normalise.h
 
 
 clean :

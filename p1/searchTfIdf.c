@@ -6,6 +6,7 @@
 #include "hashmap.h"
 #include "slist.h"
 #include "mergesort.h"
+#include "normalise.h"
 
 #define BUFF_SIZE 70
 #define EPS 1E-6
@@ -85,15 +86,18 @@ int main(int argc, char **argv){
 		strcat(buffer, ".txt");
 		FILE *f = fopen(buffer, "r");
 		
-		//jump to section 2 fscanf(f, "#start Section-2");
+		do {
+			fscanf(f, "%s", buffer);
+		} while(!feof(f) && strcmp(buffer, "#end"));
+		fscanf(f, "Section-1 #start Section-2");
 		while(fscanf(f, "%s", buffer) != EOF) {
 			if(!strcmp(buffer, "#end")){
 				break;
 			}
 
-			//normalise buffer
+			char *c = normalise(buffer);
 
-			int index = mapSearch(m, buffer);
+			int index = mapSearch(m, c);
 			if(index != -1){
 				urls[i]->tfidf += idf[index];
 			}
