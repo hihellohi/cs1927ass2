@@ -10,7 +10,7 @@ all: pagerank searchPagerank searchTfIdf
 
 
 searchTfIdf : $(OBJS2) $(OBJSAC2)
-	$(CC) -o searchTfIdf $(OBJS2) $(OBJSAC2)
+	$(CC) -lm -o searchTfIdf $(OBJS2) $(OBJSAC2)
 
 searchPagerank : $(OBJSC) $(OBJSAC2)
 	$(CC) -o searchPagerank $(OBJSC) $(OBJSAC2)
