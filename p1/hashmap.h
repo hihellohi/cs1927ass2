@@ -7,5 +7,7 @@ void mapIncrement(Hashmap, char*);
 void mapInsert(Hashmap, char *key, int value);
 int mapSearch(Hashmap, char *key);
 void dropMap(Hashmap);
+double mapCapacity(Hashmap);
+void mapDouble(Hashmap);
 
 #endif
