@@ -38,25 +38,24 @@ static unsigned int hash(char *key, int n){
 	return a % n;
 }
 
-//Creates new hashmap with an array of length nSlots
+// Creates new hashmap with an array of length nSlots
 Hashmap newHashmap(int nSlots){
 	Hashmap new = malloc(sizeof(hashmap));
 	new->nItems = 0;
 	new->nSlots = nSlots;
-	new->data = malloc(nSlots * sizeof(slist));
+	new->data = calloc(nSlots, sizeof(slist));
 
-	int i;
-	for(i = 0; i < nSlots; i++){
-		new->data[i] = newList(itemCopy, itemFree);
-	}
 	return new;
 }
 
-//m[key] = value
+// m[key] = value
 void mapInsert(Hashmap m, char *key, int value){
-	slist l;
 	char found = 0;
-	for(l = m->data[hash(key, m->nSlots)]; hasNext(l); listNext(l)) {
+	unsigned int h = hash(key, m->nSlots);
+	if(!m->data[h]) m->data[h] = newList(itemCopy, itemFree);
+	
+	slist l;
+	for(l = m->data[h]; hasNext(l); listNext(l)) {
 		listItem *val = ((listItem*)readList(l));
 		if(!strcmp(val->key, key)){
 			found = 1;
@@ -68,16 +67,20 @@ void mapInsert(Hashmap m, char *key, int value){
 	if(!found){
 		listItem new = {key, value};
 		listEnter(m->data[hash(key, m->nSlots)], &new);
+		m->nItems++;
 	}
 
 	listReset(l);
 	return;
 }
 
-//m[key]++
+// m[key]++
 void mapIncrement(Hashmap m, char *key) {
 	slist l;
-	for(l = m->data[hash(key, m->nSlots)]; hasNext(l); listNext(l)) {
+	unsigned int h = hash(key, m->nSlots);
+	if(!m->data[h]) return;
+
+	for(l = m->data[h]; hasNext(l); listNext(l)) {
 		listItem *val = ((listItem*)readList(l));
 		if(!strcmp(val->key, key)){
 			val->value++;
@@ -87,11 +90,14 @@ void mapIncrement(Hashmap m, char *key) {
 	listReset(l);
 }
 
-//m[key]
+// m[key]
 int mapSearch(Hashmap m, char *key) {
 	slist l;
+	unsigned int h = hash(key, m->nSlots);
+	if(!m->data[h]) return -1;
+	
 	int out = -1;
-	for(l = m->data[hash(key, m->nSlots)]; hasNext(l); listNext(l)) {
+	for(l = m->data[h]; hasNext(l); listNext(l)) {
 		listItem *val = ((listItem*)readList(l));
 		if(!strcmp(val->key, key)){
 			out = val->value;
@@ -102,13 +108,41 @@ int mapSearch(Hashmap m, char *key) {
 	return out;
 }
 
-//frees the map
+// frees the map
 void dropMap(Hashmap m) {
 
 	int i;
 	for(i = 0; i < m->nSlots; i++){
-		freeList(m->data[i]);
+		if(m->data[i]) freeList(m->data[i]);
 	}
 	free(m->data);
 	free(m);
 }
+
+// returns the percentage of the map being used
+double mapCapacity(Hashmap m) {
+
+	return (double)m->nItems/m->nSlots;
+}
+
+// doubles the number of slots in the map
+void mapDouble(Hashmap m) {
+	
+	slist *old = m->data;
+	m->nSlots <<= 1;
+	m->nItems = 0;
+	m->data = calloc(m->nSlots, sizeof(slist));
+
+	int i;
+	for(i = 0; i < m->nSlots >> 1; i++){
+		if(!old[i]) continue;
+		slist l;
+		for(l = old[i]; hasNext(l); listNext(l)) {
+			listItem *val = ((listItem*)readList(l));
+			mapInsert(m, val->key, val->value);
+		}
+		freeList(l);
+	}
+	free(old);
+}
+
