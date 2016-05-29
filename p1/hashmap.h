@@ -9,5 +9,7 @@ int mapSearch(Hashmap, char *key);
 void dropMap(Hashmap);
 double mapCapacity(Hashmap);
 void mapDouble(Hashmap);
+int mapSize(Hashmap);
+Hashmap mapCopy(Hashmap);
 
 #endif

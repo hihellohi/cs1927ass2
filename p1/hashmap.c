@@ -119,6 +119,32 @@ void dropMap(Hashmap m) {
 	free(m);
 }
 
+// makes a copy of the map
+Hashmap mapCopy(Hashmap m) {
+
+	Hashmap new = newHashmap(m->nSlots);
+	if(!m->nItems) return new;
+	
+	int i;
+	for(i = 0; i < m->nSlots; i++){
+		if(!m->data[i]) continue;
+
+		slist l;
+		for(l = m->data[i]; hasNext(l); listNext(l)){
+			listItem *val = ((listItem*)readList(l));
+			mapInsert(new, val->key, val->value);
+		}
+		listReset(l);
+	}
+	return new;
+}
+
+
+int mapSize(Hashmap m){
+	
+	return m->nItems;
+}
+
 // returns the percentage of the map being used
 double mapCapacity(Hashmap m) {
 

@@ -1,22 +1,26 @@
 CC=gcc
 CFLAGS=-Wall -g
-OBJSAC2=slist.o mergesort.o hashmap.o
+OBJSAC23=slist.o mergesort.o hashmap.o
 OBJSA=pagerank.o graph.o
 OBJSC=searchPagerank.o 
 OBJS2=searchTfIdf.o normalise.o
+OBJS3=scaledFootrule.o
 
-all: pagerank searchPagerank searchTfIdf
+all: pagerank searchPagerank searchTfIdf scaledFootrule
 
 
 
-searchTfIdf : $(OBJS2) $(OBJSAC2)
-	$(CC) -lm -o searchTfIdf $(OBJS2) $(OBJSAC2)
+scaledFootrule : $(OBJS3) $(OBJSAC23)
+	$(CC) -o scaledFootrule $(OBJS3) $(OBJSAC23)
 
-searchPagerank : $(OBJSC) $(OBJSAC2)
-	$(CC) -o searchPagerank $(OBJSC) $(OBJSAC2)
+searchTfIdf : $(OBJS2) $(OBJSAC23)
+	$(CC) -lm -o searchTfIdf $(OBJS2) $(OBJSAC23)
 
-pagerank : $(OBJSA) $(OBJSAC2)
-	$(CC) -o pagerank $(OBJSA) $(OBJSAC2)
+searchPagerank : $(OBJSC) $(OBJSAC23)
+	$(CC) -o searchPagerank $(OBJSC) $(OBJSAC23)
+
+pagerank : $(OBJSA) $(OBJSAC23)
+	$(CC) -o pagerank $(OBJSA) $(OBJSAC23)
 
 
 
@@ -26,6 +30,7 @@ pagerank.o : pagerank.c slist.h graph.h mergesort.h hashmap.h
 
 searchTfIdf.o : searchTfIdf.c mergesort.h hashmap.h slist.h normalise.h
 
+scaledFootrule.o : scaledFootrule.c mergesort.h hashmap.h slist.h 
 
 
 slist.o : slist.c slist.h

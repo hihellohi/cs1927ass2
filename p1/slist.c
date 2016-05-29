@@ -53,7 +53,7 @@ slist newList(void *(*copy)(void*), void (*fin)(void*)) {
 
 void listEnter(slist list, void *input){
 	node new = malloc(sizeof(struct _node));
-	if(!list->first) list->cur = new;
+	if(!list->cur) list->cur = new;
 	*(list->last) = new;
 	list->last = &(new->next);
 	new->value = list->copy(input);
