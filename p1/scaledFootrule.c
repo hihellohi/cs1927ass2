@@ -96,12 +96,6 @@ int main(int argc, char** argv) {
 	}
 	dropMap(dummy);
 
-	//TEMPORARY print masterL debug
-	for(listReset(masterL); hasNext(masterL); listNext(masterL)) {
-		printf("%s\n", (char*)readList(masterL));
-	}
-	printf("\n");
-
 	//convert masterL to an array
 	int len = listLength(masterL);
 	Url *urls = malloc(len * sizeof(struct _url*));
@@ -126,18 +120,9 @@ int main(int argc, char** argv) {
 			}
 	}
 
-	//TEMPORARY print costs
-	for(i = 0; i < len; i++) {
-		for(j = 0; j < len; j++) {
-			printf("%.6lf ", cost[i][j]);
-		}
-		printf("\n");
-	}
-	printf("\n");
-
 	/* BIPARTITE MATCHING
 	 *
-	 * Start off with an arbitrary complete matching (already done in line 113). continuously improve it by swapping until it can
+	 * Start off with an arbitrary complete matching (already done in line 106). continuously improve it by swapping until it can
 	 * no longer be improved. The resulting matching is the lowest cost one.
 	 *
 	 * we improve the matching by creating a complete weighted directed "improvement" graph where every vertex is a url and every
@@ -182,6 +167,7 @@ int main(int argc, char** argv) {
 	mergesort((void**)urls, len, urlComp, 0); 
 	printf("%.6lf\n", distance);
 
+	// freedom!
 	for(i = 0; i < len; i++) {
 		printf("%s\n", urls[i]->name);
 		free(cost[i]);
