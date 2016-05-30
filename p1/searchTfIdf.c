@@ -65,10 +65,17 @@ int main(int argc, char **argv){
 
 		} else {
 
+			FILE *tmp = tmpfile();
+			do {
+				fgets(buffer, BUFF_SIZE, inverted);
+				fprintf(tmp, "%s", buffer);
+			} while (!feof(inverted) && !strchr(buffer, '\n'));
+
+			rewind(tmp);
+				
 			int j;
-			for(j = 0; fgetc(inverted) != '\n' && !feof(inverted); j++){
-				fscanf(inverted, "%s", buffer);
-			}
+			for(j = 0; fscanf(tmp, "%s", buffer) != EOF; j++);
+			fclose(tmp);
 
 			assert(j);
 			idf[index] = log10(len/(double)j);
@@ -86,11 +93,19 @@ int main(int argc, char **argv){
 		strcat(buffer, ".txt");
 		FILE *f = fopen(buffer, "r");
 		
+		if(!f){
+			fprintf(stderr, "error opening %s\n", buffer);
+			return EXIT_FAILURE;
+		}
+
 		do {
-			fscanf(f, "%s", buffer);
-		} while(!feof(f) && strcmp(buffer, "#end"));
-		fscanf(f, "Section-1 #start Section-2");
+			fgets(buffer, BUFF_SIZE, f);
+		} while(!feof(f) && !strstr(buffer, "#end Section-1"));
+
+		fscanf(f, "#start Section-2");
+		
 		while(fscanf(f, "%s", buffer) != EOF) {
+
 			if(!strcmp(buffer, "#end")){
 				break;
 			}

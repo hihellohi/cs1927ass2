@@ -50,11 +50,19 @@ int main(int argc, char **argv) {
 		} else {
 			i++;
 
+			FILE *tmp = tmpfile();
+			do {
+				fgets(buffer, BUFF_SIZE, iI);
+				fprintf(tmp, "%s", buffer);
+			} while (!feof(iI) && !strchr(buffer, '\n'));
+
+			rewind(tmp);
 			//increment all of the files who have the word
-			while(fgetc(iI) != '\n' && !feof(iI)) {
-				fscanf(iI, "%s", buffer);
+			while (fscanf(tmp, "%s", buffer) != EOF) {
+				
 				mapIncrement(urls, buffer);
 			}
+			fclose(tmp);
 		}
 	}
 

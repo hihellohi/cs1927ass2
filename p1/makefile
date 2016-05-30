@@ -1,30 +1,39 @@
 CC=gcc
 CFLAGS=-Wall -g
-OBJSAC23=slist.o mergesort.o hashmap.o
+OBJSM=slist.o mergesort.o hashmap.o
+OBJSB2=normalise.o
 OBJSA=pagerank.o graph.o
+OBJSB=inverted.o
 OBJSC=searchPagerank.o 
-OBJS2=searchTfIdf.o normalise.o
+OBJS2=searchTfIdf.o 
 OBJS3=scaledFootrule.o
 
-all: pagerank searchPagerank searchTfIdf scaledFootrule
+EXES=pagerank inverted searchPagerank searchTfIdf scaledFootrule
+
+all: $(EXES)
 
 
 
-scaledFootrule : $(OBJS3) $(OBJSAC23)
-	$(CC) -o scaledFootrule $(OBJS3) $(OBJSAC23)
+scaledFootrule : $(OBJS3) $(OBJSM)
+	$(CC) -o scaledFootrule $(OBJS3) $(OBJSM)
 
-searchTfIdf : $(OBJS2) $(OBJSAC23)
-	$(CC) -lm -o searchTfIdf $(OBJS2) $(OBJSAC23)
+searchTfIdf : $(OBJS2) $(OBJSB2) $(OBJSM)
+	$(CC) -lm -o searchTfIdf $(OBJS2) $(OBJSB2) $(OBJSM)
 
-searchPagerank : $(OBJSC) $(OBJSAC23)
-	$(CC) -o searchPagerank $(OBJSC) $(OBJSAC23)
+searchPagerank : $(OBJSC) $(OBJSM)
+	$(CC) -o searchPagerank $(OBJSC) $(OBJSM)
 
-pagerank : $(OBJSA) $(OBJSAC23)
-	$(CC) -o pagerank $(OBJSA) $(OBJSAC23)
+inverted : $(OBJSB) $(OBJSB2) $(OBJSM)
+	$(CC) -o inverted $(OBJSB) $(OBJSB2) $(OBJSM)
+
+pagerank : $(OBJSA) $(OBJSM)
+	$(CC) -o pagerank $(OBJSA) $(OBJSM)
 
 
 
 searchPagerank.o : searchPagerank.c mergesort.h hashmap.h slist.h
+
+inverted.o : inverted.c slist.h mergesort.h hashmap.h slist.h normalise.h
 
 pagerank.o : pagerank.c slist.h graph.h mergesort.h hashmap.h
 
@@ -45,4 +54,4 @@ normalise.o : normalise.c normalise.h
 
 
 clean :
-	rm -f pagerank searchPagerank *.o core
+	rm -f $(EXES) $(OBJSM) $(OBJSB2) $(OBJSA) $(OBJSB) $(OBJSC) $(OBJS2) $(OBJS3)
