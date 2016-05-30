@@ -1,4 +1,0 @@
-jupiter url21 url23 url34
-mars url11 url22 url31 url32
-saturn url31 url32 url11 url21
-venus url11 url23 url34
