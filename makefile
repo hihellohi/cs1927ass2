@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-Wall -gdwarf-2
+CFLAGS=-Wall -gdwarf-2 -g
 OBJSM=slist.o mergesort.o hashmap.o
 OBJSB2=normalise.o
 OBJSA=pagerank.o graph.o
