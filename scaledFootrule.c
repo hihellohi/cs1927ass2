@@ -133,6 +133,8 @@ int main(int argc, char** argv) {
 	 * of said cycle. If no cycle can be found the current matching can no longer be improved (because of reasons) and therfore
 	 * is the lowest cost one.
 	 *
+	 * Best Case O(n^3), Worst case O(n^4) both of which are a lot better than o(n!)
+	 *
 	 * ref: Nite Nimajneb "The Hitchhiker’s Guide to the Programming Contests" http://orac.amt.edu.au/notes/icpc.pdf
 	 */
 	

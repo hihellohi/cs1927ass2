@@ -17,19 +17,20 @@ typedef struct _url {
 	char *name;
 	double pRank;
 	int outdeg;
+	char notActuallyZero;
 } url;
 
 static int urlComp(void* a, void* b){
 	if(((Url)a)->pRank < ((Url)b)->pRank - EPS) return -1;
 	if(((Url)a)->pRank > ((Url)b)->pRank + EPS) return 1;
-	if(((Url)a)->outdeg < ((Url)b)->outdeg) return -1;
-	return ((Url)a)->outdeg > ((Url)b)->outdeg;
+	if(((Url)a)->notActuallyZero * ((Url)a)->outdeg < ((Url)b)->notActuallyZero * ((Url)b)->outdeg) return -1;
+	return ((Url)a)->notActuallyZero * ((Url)a)->outdeg > ((Url)b)->notActuallyZero * ((Url)b)->outdeg;
 }
 
 static void print(Url *input, FILE *output, int length){
 	int i;
 	for(i = 0; i < length; i++){
-		fprintf(output, "%s, %d, %.8lf\n", input[i]->name, input[i]->outdeg, input[i]->pRank);
+		fprintf(output, "%s, %d, %.8lf\n", input[i]->name, input[i]->notActuallyZero * input[i]->outdeg, input[i]->pRank);
 	}
 	return;
 }
@@ -70,6 +71,7 @@ int main(int argc, char **argv){
 		aurls[i] = malloc(sizeof(url));
 		aurls[i]->name = (char*)readList(urls);
 		aurls[i]->pRank = (1/(double)len);
+		aurls[i]->notActuallyZero = 1;
 		mapInsert(m, aurls[i]->name, i);
 		listNext(urls);
 	}
@@ -105,6 +107,7 @@ int main(int argc, char **argv){
 				}
 			}
 			nOutgoingLinks = len - 1;
+			aurls[i]->notActuallyZero = 0;
 		}
 		aurls[i]->outdeg = nOutgoingLinks;
 		fclose(webpage);
