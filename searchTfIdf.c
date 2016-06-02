@@ -52,6 +52,10 @@ int main(int argc, char **argv){
 
 	// calculate idf
 	FILE *inverted = fopen("invertedIndex.txt", "r");
+	if(!inverted) {
+		perror("Error opening invertedIndex.txt\n");
+		return EXIT_FAILURE;
+	}
 	int len = listLength(l);	
 	double *idf = calloc(argc, sizeof(double));
 
