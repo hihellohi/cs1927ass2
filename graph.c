@@ -8,10 +8,10 @@
 #include "graph.h"
 #include "slist.h"
 
-// graph representation (adjacency matrix)
+// graph representation (adjacency list)
 typedef struct GraphRep {
 	int    nV;    // #vertices
-	slist  *edges; // matrix of weights (0 == no edge)
+	slist  *edges; 
 } GraphRep;
 
 // check validity of Vertex
