@@ -49,6 +49,7 @@ int main(int argc, char **argv){
 		assert(buffer[0]);
 		listEnter(l, buffer);
 	}
+	int len = listLength(l);	
 
 	// calculate idf
 	FILE *inverted = fopen("invertedIndex.txt", "r");
@@ -56,8 +57,9 @@ int main(int argc, char **argv){
 		perror("Error opening invertedIndex.txt\n");
 		return EXIT_FAILURE;
 	}
-	int len = listLength(l);	
+
 	double *idf = calloc(argc, sizeof(double));
+	Hashmap hits = newHashmap((len * 3)/2);
 
 	while(!feof(inverted)) {
 		fscanf(inverted, "%s", buffer);
@@ -78,7 +80,12 @@ int main(int argc, char **argv){
 			rewind(tmp);
 				
 			int j;
-			for(j = 0; fscanf(tmp, "%s", buffer) != EOF; j++);
+			for(j = 0; fscanf(tmp, "%s", buffer) != EOF; j++) {
+				if(mapSearch(hits, buffer) == -1){
+					mapInsert(hits, buffer, 0);
+				}
+				mapIncrement(hits, buffer);
+			}
 			fclose(tmp);
 
 			assert(j);
@@ -127,8 +134,12 @@ int main(int argc, char **argv){
 	
 	mergesort((void**)urls, len, urlComp, 1);
 
-	for(i = 0; i < ((len < MAX_DISPLAY) ? len : MAX_DISPLAY); i++){
-		printf("%s %.6lf\n", urls[i]->name, urls[i]->tfidf);
+	int j;
+	for(i = 0, j = 0; i < len && j < MAX_DISPLAY; i++){
+		if(mapSearch(hits, urls[i]->name) == argc) {
+			printf("%s %.6lf\n", urls[i]->name, urls[i]->tfidf);
+			j++;
+		}
 	}
 	
 	for(i = 0; i < len; i++){
@@ -141,5 +152,6 @@ int main(int argc, char **argv){
 	freeList(l);
 	free(idf);
 	dropMap(m);
+	dropMap(hits);
 	return EXIT_SUCCESS;
 }
