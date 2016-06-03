@@ -5,7 +5,7 @@
 #include "mergesort.h"
 #include "hashmap.h"
 
-#define BUFF_SIZE 100
+#define BUFF_SIZE 200
 #define MAX_DISPLAY 10
 
 int main(int argc, char **argv) {
@@ -21,7 +21,7 @@ int main(int argc, char **argv) {
 	slist l = newList((void*)strdup, free);
 
 	char buffer[BUFF_SIZE];
-	while(fgets(buffer, BUFF_SIZE, pL)) {		
+	while(fgets(buffer, BUFF_SIZE - 1, pL)) {		
 		char *c = strchr(buffer, ',');
 		if(!c) continue;
 		*c = '\0';
@@ -52,7 +52,7 @@ int main(int argc, char **argv) {
 
 			FILE *tmp = tmpfile();
 			do {
-				fgets(buffer, BUFF_SIZE, iI);
+				fgets(buffer, BUFF_SIZE - 1, iI);
 				fprintf(tmp, "%s", buffer);
 			} while (!feof(iI) && !strchr(buffer, '\n'));
 

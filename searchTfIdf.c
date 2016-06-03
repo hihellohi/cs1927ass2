@@ -8,7 +8,7 @@
 #include "mergesort.h"
 #include "normalise.h"
 
-#define BUFF_SIZE 70
+#define BUFF_SIZE 200
 #define EPS 1E-6
 #define MAX_DISPLAY 10
 
@@ -73,7 +73,7 @@ int main(int argc, char **argv){
 
 			FILE *tmp = tmpfile();
 			do {
-				fgets(buffer, BUFF_SIZE, inverted);
+				fgets(buffer, BUFF_SIZE - 1, inverted);
 				fprintf(tmp, "%s", buffer);
 			} while (!feof(inverted) && !strchr(buffer, '\n'));
 
@@ -110,7 +110,7 @@ int main(int argc, char **argv){
 		}
 
 		do {
-			fgets(buffer, BUFF_SIZE, f);
+			fgets(buffer, BUFF_SIZE - 1, f);
 		} while(!feof(f) && !strstr(buffer, "#end Section-1"));
 
 		fscanf(f, "#start Section-2");
