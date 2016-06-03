@@ -134,7 +134,7 @@ int main(int argc, char **argv){
 
 			sum *= d;
 			sum += (1 - d)/len;
-			diff += abs(aurls[j]->pRank - sum);
+			diff += fabs(aurls[j]->pRank - sum);
 			newPRanks[j] = sum;
 		}
 		for(j = 0; j < len; j++) {
