@@ -23,8 +23,7 @@ int main (void){
 	FILE *fp;
 	FILE *fp2;
 	FILE *open;
-	char *url;
-	url= (char *)malloc(sizeof(char));
+	char url[MAXURL];
 	char store[MAXURL];
 	char word[MAXURL];
 	char *line=malloc(sizeof(char)*1000);
@@ -49,9 +48,6 @@ int main (void){
 	}
 
 	while(fscanf(fp, "%s", url) != EOF){
-		if((*url)==' '|| (*url)=='\n'||(*url)=='\t'){
-			continue;
-		}
 		listEnter(urls,url);
 	}
 
@@ -171,7 +167,6 @@ int main (void){
 	freeList(vocab);
 	freeList(urls);
 	free(line);
-	free(url);
 	fclose(fp);
 	fclose(open);
 	return 0;
