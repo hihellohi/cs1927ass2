@@ -57,7 +57,6 @@ int main (void){
 
 	while(hasNext(urls)){
 		strcpy(store,(char*)readList(urls));
-		// strcpy(world,store);
 		strcat(store,".txt");
 
 		if((fp2=fopen(store,"r"))==NULL){
@@ -82,7 +81,6 @@ int main (void){
 			}
 			strcpy(word,line);
 			normalise(word);
-			printf("the words are %s\n",word);
 			if(mapSearch(m,word)==-1){
 				listEnter(vocab,word);
 				mapInsert(m,word,j);
@@ -107,7 +105,6 @@ int main (void){
 
 	while(hasNext(urls)){
 		strcpy(store,(char*)readList(urls));
-		// strcpy(world,store);
 		strcat(store,".txt");
 
 		if((fp2=fopen(store,"r"))==NULL){
@@ -166,13 +163,15 @@ int main (void){
 
 
 	for(i=0;i<numWord;i++){
+		freeList(addressbook[i]->address);
 		free(addressbook[i]);
 	}
 	free(addressbook);
 	dropMap(m);
-	listReset(urls);
 	freeList(vocab);
 	freeList(urls);
+	free(line);
+	free(url);
 	fclose(fp);
 	fclose(open);
 	return 0;
